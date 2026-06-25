@@ -1,45 +1,100 @@
-const cube = document.getElementById('cube');
-const scene = document.getElementById('scene');
+// Mobile Menu Toggle
+const hamburger = document.querySelector('.hamburger');
+const navMenu = document.querySelector('.nav-menu');
+const navLinks = document.querySelectorAll('.nav-link');
 
-if (scene && cube) {
-  scene.addEventListener('pointermove', (event) => {
-    const rect = scene.getBoundingClientRect();
-    const x = event.clientX - rect.left - rect.width / 2;
-    const y = event.clientY - rect.top - rect.height / 2;
-    const rotateY = x / rect.width * 45;
-    const rotateX = -y / rect.height * 30;
-    cube.style.transform = `rotateX(${rotateX - 20}deg) rotateY(${rotateY + 35}deg)`;
-  });
+// Toggle menu when hamburger is clicked
+hamburger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+});
 
-  scene.addEventListener('pointerleave', () => {
-    cube.style.transform = '';
-  });
+// Close menu when a nav link is clicked
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+    });
+});
+
+// Smooth scrolling for navigation links
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        
+        if (targetSection) {
+            targetSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Update active nav link on scroll
+window.addEventListener('scroll', () => {
+    let current = '';
+    
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+        }
+    });
+});
+
+// CTA Button click handler - Navigate to products
+const ctaButton = document.querySelector('.cta-button');
+if (ctaButton) {
+    ctaButton.addEventListener('click', () => {
+        const productsSection = document.querySelector('#products');
+        productsSection.scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
 }
 
-window.addEventListener('scroll', () => {
-  const sections = document.querySelectorAll('section, footer');
-  sections.forEach((section) => {
-    const rect = section.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 120) {
-      section.style.opacity = '1';
-      section.style.transform = 'translateY(0px)';
-    }
-  });
+// Product View Details button handler
+const productButtons = document.querySelectorAll('.product-btn');
+productButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const productCard = this.closest('.product-card');
+        const productName = productCard.querySelector('h3').textContent;
+        const productPrice = productCard.querySelector('.product-price').textContent;
+        alert(`Product: ${productName}\n${productPrice}\n\nFor more details, please contact us.`);
+    });
 });
 
-document.querySelectorAll('section, .topbar, footer').forEach((element) => {
-  if (element instanceof HTMLElement) {
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(24px)';
-    element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-  }
+// Add scroll animation for product cards
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.animation = 'slideUp 0.6s ease-out';
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+// Observe product cards
+const productCards = document.querySelectorAll('.product-card');
+productCards.forEach(card => {
+    observer.observe(card);
 });
 
-window.addEventListener('load', () => {
-  document.querySelectorAll('section, .topbar, footer').forEach((element) => {
-    if (element instanceof HTMLElement) {
-      element.style.opacity = '1';
-      element.style.transform = 'translateY(0px)';
-    }
-  });
-});
+// Console greeting
+console.log('%cWelcome to DOORWINDS SOLUTIONS', 'font-size: 20px; font-weight: bold; color: #3498db;');
+console.log('%cPremium Doors & Windows Products', 'font-size: 14px; color: #2c3e50;');
